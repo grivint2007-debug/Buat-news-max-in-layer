@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kalkulator Max Layer Grid</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--tx:#14181f;--mu:#5b6573;--bd:#dde1e7;--ac:#b7791f;--ok:#15803d;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1318;--card:#181e26;--tx:#e8ebf0;--mu:#9aa5b4;--bd:#2a323d;--ac:#e0a84a;--ok:#4ade80;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1318;--card:#181e26;--tx:#e8ebf0;--mu:#9aa5b4;--bd:#2a323d;--ac:#e0a84a;--ok:#4ade80;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 -apple-system,system-ui,Segoe UI,Roboto,sans-serif;padding:14px}
+.w{max-width:760px;margin:0 auto}
+h1{font-size:19px;margin:4px 0 12px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:12px}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label{display:block;font-size:12px;color:var(--mu);margin-bottom:3px}
+input,select{width:100%;padding:9px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-size:16px}
+.s{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:2px}
+.s div{background:var(--bg);border-radius:8px;padding:8px}
+.s b{display:block;font-size:17px;color:var(--ac)}
+.s span{font-size:12px;color:var(--mu)}
+.sc{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{padding:8px 6px;text-align:right;border-bottom:1px solid var(--bd);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{font-size:12px;color:var(--mu);font-weight:600}
+td.mx{color:var(--ac);font-weight:700}
+td.sf{color:var(--ok);font-weight:700}
+.n{font-size:12px;color:var(--mu);margin:8px 2px 0}
+.brand{text-align:center;font-size:clamp(34px,11vw,56px);font-weight:800;letter-spacing:1px;margin:6px 0 14px;color:#d8a8ff;text-shadow:0 0 6px #bf5fff,0 0 14px #a020f0,0 0 28px #8a2be2,0 0 48px #7b1fd6}
+.tt{display:table;margin:-6px auto 14px;padding:2px 10px;border-radius:999px;background:#e8ebf0;color:#000;font-size:12px;font-weight:600;text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="w">
+<div class="brand">GrivintFx</div>
+<div class="tt">TT: vint0707</div>
+<div class="card">
+<h1 style="font-size:16px;margin:0 0 10px">News</h1>
+<div style="display:flex;flex-wrap:wrap;gap:8px">
+<span style="color:#ff2a2a;font-weight:800;font-size:15px">NFP</span>
+<span style="color:#ff2a2a;font-weight:800;font-size:15px">CPI</span>
+<span style="color:#ff2a2a;font-weight:800;font-size:15px">PPI</span>
+<span style="color:#ff2a2a;font-weight:800;font-size:15px">FOMC</span>
+<span style="color:#ff2a2a;font-weight:800;font-size:15px">dll</span>
+</div>
+</div>
+<h1>Kalkulator Max Layer (lapisan) XAUUSD</h1>
+<div class="card">
+<div class="g">
+<div><label>Modal</label><input id="m" type="number" inputmode="decimal" value="500"></div>
+<div><label>Satuan</label><select id="u"><option value="c">Cent (¢)</option><option value="d">Dollar ($)</option></select></div>
+<div><label>Leverage (daya ungkit) 1 :</label><select id="lv"><option>200</option><option>300</option><option selected>500</option><option>1000</option><option>2000</option><option>3000</option><option>4000</option></select></div>
+<div><label>Harga XAUUSD</label><input id="p" type="number" value="3880"></div>
+</div>
+</div>
+<div class="card sc">
+<table>
+<thead><tr><th>Lot</th><th>Max layer (mentok)</th></tr></thead>
+<tbody id="tb"></tbody>
+</table>
+</div>
+<p class="n">Max layer (mentok) = jumlah layer (lapisan) sampai margin habis, lot sama tiap layer. Margin lot 0.01 di 1:1000 sekitar 3,88 (cent kalau akun cent, dollar kalau akun dollar). Belum menghitung floating loss (rugi mengambang), jadi di real trading kurangi lagi.</p>
+</div>
+<script>
+const LOTS=[0.01,0.02,0.03,0.05,0.07,0.10,0.15,0.20,0.30,0.50,0.70,1.00];
+const CS=100;
+const $=i=>document.getElementById(i);
+function calc(){
+  const raw=+$('m').value||0, usd=$('u').value==='c'?raw/100:raw;
+  const lv=+$('lv').value||1, p=+$('p').value||0;
+  const mpl=p*CS/lv;
+  let h='';
+  for(const l of LOTS){
+    const mg=l*mpl, n=mg>0?Math.floor(raw/mg):0;
+    h+=`<tr><td>${l.toFixed(2)}</td><td class="mx">${n}</td></tr>`;
+  }
+  $('tb').innerHTML=h;
+}
+document.querySelectorAll('input,select').forEach(e=>e.addEventListener('input',calc));
+calc();
+</script>
+</body>
+</html>
